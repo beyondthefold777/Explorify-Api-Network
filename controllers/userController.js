@@ -14,8 +14,10 @@ const getUsers = async (req, res) => {
 const createUser = async (req, res) => {
   try {
     const user = await User.create(req.body);
+    console.log('User created:', user); 
     res.json(user);
   } catch (err) {
+    console.error('Error creating user:', err); 
     res.status(500).json(err);
   }
 };
