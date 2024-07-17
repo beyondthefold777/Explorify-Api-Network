@@ -1,45 +1,63 @@
 const { User } = require('../models');
 
-// Controller to get all users
-const getUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    res.json(users);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-};
+module.exports = {
+  // Get all users
+  async getUsers(req, res) {
+    try {
+      const users = await User.find();
+      res.json(users);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
+  // Get a single user by ID
+  async getSingleUser(req, res) {
+    try {
+      const user = await User.findOne({ _id: req.params.userId })
+        .select('-__v')
+        .populate('thoughts')
+        .populate('friends');
 
-// Controller to create a new user
-const createUser = async (req, res) => {
-  try {
-    const user = await User.create(req.body);
-    console.log('User created:', user); 
-    res.json(user);
-  } catch (err) {
-    console.error('Error creating user:', err); 
-    res.status(500).json(err);
-  }
-};
+      if (!user) {
+        return res.status(404).json({ message: 'No user with that ID' });
+      }
 
-// Controller to update a user by ID
-const updateUser = async (req, res) => {
-  try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(user);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+      res.json(user);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
+  // Create a new user
+  async createUser(req, res) {
+    try {
+      const user = await User.create(req.body);
+      res.json(user);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
+  // Update a user by ID
+  async updateUser(req, res) {
+    try {
+      const user = await User.findByIdAndUpdate(req.params.userId, req.body, { new: true });
+      if (!user) {
+        return res.status(404).json({ message: 'No user with that ID' });
+      }
+      res.json(user);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
+  // Delete a user by ID
+  async deleteUser(req, res) {
+    try {
+      const user = await User.findByIdAndDelete(req.params.userId);
+      if (!user) {
+        return res.status(404).json({ message: 'No user with that ID' });
+      }
+      res.json({ message: 'User deleted' });
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
 };
-
-// Controller to delete a user by ID
-const deleteUser = async (req, res) => {
-  try {
-    await User.findByIdAndDelete(req.params.id);
-    res.json({ message: 'User deleted' });
-  } catch (err) {
-    res.status(500).json(err);
-  }
-};
-
-module.exports = { getUsers, createUser, updateUser, deleteUser };
