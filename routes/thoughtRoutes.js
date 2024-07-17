@@ -7,10 +7,10 @@ router.get('/thoughts', getThoughts);
 // POST a new thought
 router.post('/thoughts', createThought);
 
-// PUT to update a thought by its _id
+// PUT to update a thought by ID
 router.put('/thoughts/:id', updateThought);
 
-// DELETE to remove thought by its _id
+// DELETE to remove a thought by ID
 router.delete('/thoughts/:id', deleteThought);
 
 module.exports = router;
