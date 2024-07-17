@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables
@@ -9,12 +10,16 @@ const port = 3001;
 app.use(express.json());
 
 // Use environment variables for connection string
-const { MONGO_USER, MONGO_PASSWORD, MONGO_DB } = process.env;
+const { MONGO_USER, MONGO_PASSWORD, MONGO_DB, MONGO_HOST, MONGO_PORT } = process.env;
 
-// Construct the connection string for local MongoDB
-const connectionString = `mongodb://localhost:27017/${MONGO_DB}`;
+// Construct the connection string for MongoDB with authentication
+const connectionString = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}?authSource=admin`;
 
-mongoose.connect(connectionString)
+mongoose.connect(connectionString, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  authMechanism: 'SCRAM-SHA-256' 
+})
   .then(() => {
     console.log('Connected successfully to MongoDB');
     app.listen(port, () => {
